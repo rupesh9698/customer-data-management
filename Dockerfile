@@ -1,5 +1,5 @@
-# Use an official OpenJDK 21 image as a parent image
-FROM openjdk:21-jdk-slim AS build
+# Use an official Amazon Corretto 21 image for building the application
+FROM amazoncorretto:21 AS build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -11,8 +11,8 @@ COPY . .
 # For Gradle
 RUN ./gradlew assemble
 
-# Use a slim JRE base image to reduce size for runtime
-FROM openjdk:21-jre-slim AS runtime
+# Use a Corretto slim JRE base image to reduce size for runtime
+FROM amazoncorretto:21-alpine AS runtime
 
 # Set the working directory
 WORKDIR /app
@@ -31,3 +31,7 @@ ENV DATASOURCE_DIALECT=POSTGRES
 
 # Define the default command to run the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+# Health check (optional, adjust based on your endpoint)
+HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 \
+  CMD curl --fail http://localhost:5424/health || exit 1
