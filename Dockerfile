@@ -7,8 +7,10 @@ WORKDIR /app
 # Copy the application source code to the container
 COPY . .
 
-# Build the Micronaut application using Gradle/Maven (depending on your build tool)
-# For Gradle
+# Ensure that the Gradle wrapper script has executable permissions
+RUN chmod +x ./gradlew
+
+# Build the Micronaut application using Gradle
 RUN ./gradlew assemble
 
 # Use a Corretto slim JRE base image to reduce size for runtime
