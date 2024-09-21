@@ -2,6 +2,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("io.micronaut.application") version "3.7.3"
     id("io.micronaut.test-resources") version "3.7.3"
+    id("java")
 }
 
 version = "1"
@@ -68,6 +69,14 @@ micronaut {
     processing {
         incremental(true)
         annotations("com.dm.customer.*")
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.dm.customer.Application'
+        )
     }
 }
 
