@@ -32,7 +32,6 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:7.3")
     implementation("io.swagger.core.v3:swagger-annotations")
     implementation 'io.micronaut:micronaut-inject-java:3.9.7'
-    //postgres sql Dependency
     implementation("io.micronaut.beanvalidation:micronaut-hibernate-validator")
     implementation("io.micronaut.sql:micronaut-hibernate-jpa")
     implementation("io.micronaut.data:micronaut-data-jdbc")
@@ -52,16 +51,17 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 }
 
-
 application {
     mainClass.set("com.dm.customer.Application")
 }
+
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-    targetCompatibility = JavaVersion.toVersion("17")
+    sourceCompatibility = JavaVersion.toVersion("21")
+    targetCompatibility = JavaVersion.toVersion("21")
 }
 
 graalvmNative.toolchainDetection = false
+
 micronaut {
     runtime("netty")
     testRuntime("junit5")
@@ -71,5 +71,10 @@ micronaut {
     }
 }
 
-
-
+shadowJar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.dm.customer.Application'
+        )
+    }
+}
