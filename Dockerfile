@@ -20,7 +20,7 @@ FROM amazoncorretto:21-alpine AS runtime
 WORKDIR /app
 
 # Copy the built application from the build stage
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+COPY --from=build /app/build/libs/*-all.jar /app/app.jar
 
 # Expose the application port specified in the application.yml (port 5424)
 EXPOSE 5424
