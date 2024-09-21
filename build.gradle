@@ -12,9 +12,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.projectlombok:lombok")
 
-    annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.spring:micronaut-spring-annotation")
     annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation")
@@ -33,7 +31,7 @@ dependencies {
     implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
     implementation("net.logstash.logback:logstash-logback-encoder:7.3")
     implementation("io.swagger.core.v3:swagger-annotations")
-    implementation 'io.micronaut:micronaut-inject-java:3.8.6'
+    implementation 'io.micronaut:micronaut-inject-java:3.9.7'
     //postgres sql Dependency
     implementation("io.micronaut.beanvalidation:micronaut-hibernate-validator")
     implementation("io.micronaut.sql:micronaut-hibernate-jpa")
