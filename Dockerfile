@@ -26,9 +26,9 @@ COPY --from=build /app/build/libs/*-all.jar /app/app.jar
 EXPOSE 5424
 
 # Set environment variables for PostgreSQL connection
-ENV DATASOURCE_URL=jdbc:postgresql://dpg-crnd9j68ii6s73ep59fg-a:5432/customer_data_management_cbz7
-ENV DATASOURCE_USERNAME=customer_data_management_cbz7_user
-ENV DATASOURCE_PASSWORD=RORP8cj3sMAAt2o5TPTgufA7VMz6MMih
+ENV DATASOURCE_URL=postgresql://postgresql_ece9_user:dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9@dpg-d300rg2dbo4c73b599kg-a/postgresql_ece9
+ENV DATASOURCE_USERNAME=postgresql_ece9_user
+ENV DATASOURCE_PASSWORD=dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
 ENV DATASOURCE_DIALECT=POSTGRES
 
 # Define the default command to run the application

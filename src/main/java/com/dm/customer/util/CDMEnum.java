@@ -9,6 +9,7 @@ import static com.dm.customer.util.CDMUtility.CDM_400;
  * CDMEnum enum for code message and http status
  */
 public enum CDMEnum {
+
     ERROR_REQUEST_CUSTOMER_ID_IS_INVALID(CDM_400, "Bad-Request - Error request customer id is invalid", HttpStatus.BAD_REQUEST),
     ERROR_REQUEST_CUSTOMER_NAME_BLANK_OR_NULL(CDM_400, "Bad-Request - Error request customer name blank or null", HttpStatus.BAD_REQUEST),
     ERROR_REQUEST_CUSTOMER_MOBILE_NUMBER_BLANK_OR_NULL(CDM_400, "Bad-Request - Error request customer mobile number blank or null", HttpStatus.BAD_REQUEST),
