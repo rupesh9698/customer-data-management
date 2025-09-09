@@ -9,12 +9,11 @@ COPY . .
 # Fix permissions for gradlew
 RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 
-# Build with strict memory limits for Render
+# Build application with memory constraints for Render's environment
 RUN ./gradlew --no-daemon \
-    --no-build-cache \
-    --no-parallel \
-    -Dorg.gradle.jvmargs="-Xmx512m -XX:MaxMetaspaceSize=128m" \
-    clean build -x test
+    -Dorg.gradle.jvmargs="-Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport" \
+    -Dorg.gradle.workers.max=2 \
+    clean assemble -x test
 
 # --- Runtime stage ---
 FROM amazoncorretto:21-alpine AS runtime
@@ -24,8 +23,8 @@ RUN apk add --no-cache curl
 
 WORKDIR /app
 
-# Copy the built JAR
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+# Copy the built fat JAR (created by micronaut application plugin)
+COPY --from=build /app/build/libs/*-all.jar /app/app.jar
 
 # Create non-root user
 RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appuser
