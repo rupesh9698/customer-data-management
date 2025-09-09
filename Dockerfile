@@ -5,39 +5,52 @@ FROM gradle:9.0.0-jdk21 AS build
 # Set working directory
 WORKDIR /app
 
-# Copy source code
-COPY . .
+# Copy gradle wrapper and build files first (for better caching)
+COPY gradle/ gradle/
+COPY gradlew build.gradle.kts settings.gradle.kts ./
+COPY micronaut-cli.yml ./
 
-# Ensure gradlew has correct permissions (fix for Windows checkouts)
+# Ensure gradlew has correct permissions
 RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 
-# Build application JAR without using daemon (limits memory)
-# RUN ./gradlew --no-daemon -Dorg.gradle.jvmargs="-Xmx512m" clean build
-RUN ./gradlew clean build
+# Download dependencies (this layer will be cached)
+RUN ./gradlew --no-daemon dependencies
+
+# Copy source code
+COPY src/ src/
+
+# Build application with memory constraints for Render's environment
+RUN ./gradlew --no-daemon \
+    -Dorg.gradle.jvmargs="-Xmx768m -XX:MaxMetaspaceSize=256m -XX:+UseContainerSupport" \
+    -Dorg.gradle.workers.max=2 \
+    clean build -x test
 
 # --- Runtime stage ---
 FROM amazoncorretto:21-alpine AS runtime
 
-# Install curl (needed for healthcheck)
+# Install curl for healthcheck
 RUN apk add --no-cache curl
 
 WORKDIR /app
 
-# Copy built application (regular JAR, since no Shadow)
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+# Copy built JAR
+COPY --from=build /app/build/libs/*-all.jar /app/app.jar
 
-# Expose application port
+# Create non-root user for security
+RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appuser
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+# Expose port
 EXPOSE 5424
 
-# Database configuration (injected at runtime by Render)
-ENV DATASOURCE_URL=jdbc:postgresql://dpg-d300rg2dbo4c73b599kg-a:5432/postgresql_ece9
-ENV DATASOURCE_USERNAME=postgresql_ece9_user
-ENV DATASOURCE_PASSWORD=dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
-ENV DATASOURCE_DIALECT=POSTGRES
+# Environment variables (consider moving sensitive data to Render environment variables)
+ENV MICRONAUT_ENVIRONMENTS=production
+ENV JAVA_OPTS="-Xmx256m -XX:+UseContainerSupport -XX:+UseG1GC"
 
-# Run the Micronaut app
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Run application with optimized JVM settings
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
 
-# Health check endpoint
-HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 \
-  CMD curl --fail https://customer-data-management-micronaut.onrender.com/health || exit 1
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl --fail http://localhost:5424/health || exit 1
