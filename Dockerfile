@@ -1,39 +1,43 @@
-# Use an official Amazon Corretto 21 image for building the application
-FROM amazoncorretto:21 AS build
+# --- Build stage ---
+# Use official Gradle 9 with JDK 21
+FROM gradle:9.0.0-jdk21 AS build
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the application source code to the container
+# Copy source code
 COPY . .
 
-# Ensure that the Gradle wrapper script has executable permissions
-RUN chmod +x ./gradlew
+# Ensure gradlew has correct permissions (fix for Windows checkouts)
+RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 
-# Build the Micronaut application using Gradle
-RUN ./gradlew assemble
+# Build application JAR without using daemon (limits memory)
+RUN ./gradlew --no-daemon -Dorg.gradle.jvmargs="-Xmx512m" clean build
 
-# Use a Corretto slim JRE base image to reduce size for runtime
+
+# --- Runtime stage ---
 FROM amazoncorretto:21-alpine AS runtime
 
-# Set the working directory
+# Install curl (needed for healthcheck)
+RUN apk add --no-cache curl
+
 WORKDIR /app
 
-# Copy the built application from the build stage
-COPY --from=build /app/build/libs/*-all.jar /app/app.jar
+# Copy built application (regular JAR, since no Shadow)
+COPY --from=build /app/build/libs/*.jar /app/app.jar
 
-# Expose the application port specified in the application.yml (port 5424)
+# Expose application port
 EXPOSE 5424
 
-# Set environment variables for PostgreSQL connection
+# Database configuration (injected at runtime by Render)
 ENV DATASOURCE_URL=postgresql://postgresql_ece9_user:dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9@dpg-d300rg2dbo4c73b599kg-a/postgresql_ece9
 ENV DATASOURCE_USERNAME=postgresql_ece9_user
 ENV DATASOURCE_PASSWORD=dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
 ENV DATASOURCE_DIALECT=POSTGRES
 
-# Define the default command to run the application
+# Run the Micronaut app
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
 
-# Health check (optional, adjust based on your endpoint)
+# Health check endpoint
 HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 \
   CMD curl --fail http://localhost:5424/health || exit 1
