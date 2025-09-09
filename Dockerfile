@@ -13,7 +13,7 @@ RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 
 # Build application JAR without using daemon (limits memory)
 # RUN ./gradlew --no-daemon -Dorg.gradle.jvmargs="-Xmx512m" clean build
-RUN ./gradlew assemble
+RUN ./gradlew clean build
 
 # --- Runtime stage ---
 FROM amazoncorretto:21-alpine AS runtime
