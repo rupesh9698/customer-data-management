@@ -13,7 +13,7 @@ RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 RUN ./gradlew --no-daemon \
     -Dorg.gradle.jvmargs="-Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport" \
     -Dorg.gradle.workers.max=2 \
-    clean assemble -x test
+    clean build -x test
 
 # --- Runtime stage ---
 FROM amazoncorretto:21-alpine AS runtime
@@ -23,8 +23,8 @@ RUN apk add --no-cache curl
 
 WORKDIR /app
 
-# Copy the built fat JAR (created by micronaut application plugin)
-COPY --from=build /app/build/libs/*-all.jar /app/app.jar
+# Copy the built JAR
+COPY --from=build /app/build/libs/*.jar /app/app.jar
 
 # Create non-root user
 RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appuser
