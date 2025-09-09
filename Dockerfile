@@ -1,29 +1,19 @@
 # --- Build stage ---
-# Use official Gradle 9 with JDK 21
 FROM gradle:9.0.0-jdk21 AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy gradle wrapper and build files first (for better caching)
-COPY gradle/ gradle/
-COPY gradlew ./
-COPY build.gradle* settings.gradle* ./
-COPY micronaut-cli.yml* ./
+# Copy everything at once
+COPY . .
 
-# Ensure gradlew has correct permissions
+# Fix permissions for gradlew
 RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 
-# Download dependencies (this layer will be cached)
-RUN ./gradlew --no-daemon dependencies
-
-# Copy source code
-COPY src/ src/
-
-# Build application with memory constraints for Render's environment
+# Build with strict memory limits for Render
 RUN ./gradlew --no-daemon \
-    -Dorg.gradle.jvmargs="-Xmx768m -XX:MaxMetaspaceSize=256m -XX:+UseContainerSupport" \
-    -Dorg.gradle.workers.max=2 \
+    --no-build-cache \
+    --no-parallel \
+    -Dorg.gradle.jvmargs="-Xmx512m -XX:MaxMetaspaceSize=128m" \
     clean build -x test
 
 # --- Runtime stage ---
@@ -34,24 +24,29 @@ RUN apk add --no-cache curl
 
 WORKDIR /app
 
-# Copy built JAR
-COPY --from=build /app/build/libs/*-all.jar /app/app.jar
+# Copy the built JAR
+COPY --from=build /app/build/libs/*.jar /app/app.jar
 
-# Create non-root user for security
+# Create non-root user
 RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appuser
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-# Expose port
 EXPOSE 5424
 
-# Environment variables (consider moving sensitive data to Render environment variables)
+# Environment variables
 ENV MICRONAUT_ENVIRONMENTS=production
-ENV JAVA_OPTS="-Xmx256m -XX:+UseContainerSupport -XX:+UseG1GC"
+ENV JAVA_OPTS="-Xmx256m -XX:+UseContainerSupport"
 
-# Run application with optimized JVM settings
+# Database config
+ENV DATASOURCE_URL=jdbc:postgresql://dpg-d300rg2dbo4c73b599kg-a:5432/postgresql_ece9
+ENV DATASOURCE_USERNAME=postgresql_ece9_user
+ENV DATASOURCE_PASSWORD=dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
+ENV DATASOURCE_DIALECT=POSTGRES
+
+# Run the app
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
 
-# Health check
+# Health check using localhost
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl --fail http://localhost:5424/health || exit 1
