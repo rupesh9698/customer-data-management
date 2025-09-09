@@ -12,8 +12,8 @@ COPY . .
 RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 
 # Build application JAR without using daemon (limits memory)
-RUN ./gradlew --no-daemon -Dorg.gradle.jvmargs="-Xmx512m" clean build
-
+# RUN ./gradlew --no-daemon -Dorg.gradle.jvmargs="-Xmx512m" clean build
+RUN ./gradlew assemble
 
 # --- Runtime stage ---
 FROM amazoncorretto:21-alpine AS runtime
@@ -30,7 +30,7 @@ COPY --from=build /app/build/libs/*.jar /app/app.jar
 EXPOSE 5424
 
 # Database configuration (injected at runtime by Render)
-ENV DATASOURCE_URL=postgresql://postgresql_ece9_user:dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9@dpg-d300rg2dbo4c73b599kg-a/postgresql_ece9
+ENV DATASOURCE_URL=jdbc:postgresql://dpg-d300rg2dbo4c73b599kg-a:5432/postgresql_ece9
 ENV DATASOURCE_USERNAME=postgresql_ece9_user
 ENV DATASOURCE_PASSWORD=dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
 ENV DATASOURCE_DIALECT=POSTGRES
@@ -40,4 +40,4 @@ ENTRYPOINT ["java", "-jar", "/app/app.jar"]
 
 # Health check endpoint
 HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 \
-  CMD curl --fail http://localhost:5424/health || exit 1
+  CMD curl --fail https://customer-data-management-micronaut.onrender.com/health || exit 1

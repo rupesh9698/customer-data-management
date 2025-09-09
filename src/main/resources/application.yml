@@ -13,40 +13,29 @@ micronaut:
       swagger-ui:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger-ui/**
+  validator:
+    enabled: true
 datasources:
   default:
     driverClassName: org.postgresql.Driver
     db-type: postgres
-    url: jdbc:postgresql://dpg-crnd9j68ii6s73ep59fg-a:5432/customer_data_management_cbz7
-    username: customer_data_management_cbz7_user
-    password: RORP8cj3sMAAt2o5TPTgufA7VMz6MMih
+    url: jdbc:postgresql://dpg-d300rg2dbo4c73b599kg-a:5432/postgresql_ece9
+#    If Running Other than Render
+#    url: jdbc:postgresql://dpg-d300rg2dbo4c73b599kg-a.singapore-postgres.render.com:5432/postgresql_ece9
+    username: postgresql_ece9_user
+    password: dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
     dialect: POSTGRES
-#    driverClassName: org.postgresql.Driver
-#    db-type: postgres
-#    url: jdbc:postgresql://localhost:5432/customer_data_management
-#    username: postgres
-#    password: Pass@1234
-#    dialect: POSTGRES
 netty:
   default:
     allocator:
       max-order: 3
 jpa:
   default:
+    entity-scan:
+      packages: com.dm.customer.model
     properties:
       hibernate:
         enable_lazy_load_no_trans: true
         hbm2ddl:
           auto: update
         show_sql: true
-      entity-scan:
-        packages: com.dm.customer.model
-#jpa:
-#  default:
-#    entity-scan:
-#      packages: 'com.dm.customer'
-#  show-sql: true
-#  hibernate:
-#    ddl-auto: update
-#  properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
-#jpa.default.properties.hibernate.hbm2ddl.auto: update
