@@ -1,6 +1,6 @@
 package com.dm.customer.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * LoginRegisterModel model class
