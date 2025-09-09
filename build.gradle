@@ -79,15 +79,3 @@ micronaut {
         annotations("com.dm.customer.*")
     }
 }
-
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = "com.dm.customer.Application"
-    }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from({
-        configurations.runtimeClasspath.get()
-                .filter { it.name.endsWith("jar") }
-                .map { zipTree(it) }
-    })
-}
