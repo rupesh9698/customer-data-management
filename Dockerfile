@@ -7,8 +7,9 @@ WORKDIR /app
 
 # Copy gradle wrapper and build files first (for better caching)
 COPY gradle/ gradle/
-COPY gradlew build.gradle.kts settings.gradle.kts ./
-COPY micronaut-cli.yml ./
+COPY gradlew ./
+COPY build.gradle* settings.gradle* ./
+COPY micronaut-cli.yml* ./
 
 # Ensure gradlew has correct permissions
 RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
