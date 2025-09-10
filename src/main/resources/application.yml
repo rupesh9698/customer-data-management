@@ -2,7 +2,7 @@ micronaut:
   application:
     name: customerDataManagement
   server:
-    port: 5424
+    port: 8080
     cors:
       enabled: true
   router:
