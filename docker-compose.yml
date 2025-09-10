@@ -6,7 +6,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - DATASOURCE_URL=jdbc:postgresql://dpg-d300rg2dbo4c73b599kg-a:5432/postgresql_ece9
+      - DATASOURCE_URL=jdbc:postgresql://dpg-d300rg2dbo4c73b599kg-a.singapore-postgres.render.com:5432/postgresql_ece9
       - DATASOURCE_USERNAME=postgresql_ece9_user
       - DATASOURCE_PASSWORD=dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
     depends_on:
