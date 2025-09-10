@@ -38,7 +38,7 @@ ENV MICRONAUT_ENVIRONMENTS=production
 ENV JAVA_OPTS="-Xmx256m -XX:+UseContainerSupport"
 
 # Database config
-ENV DATASOURCE_URL=jdbc:postgresql://dpg-d300rg2dbo4c73b599kg-a.singapore-postgres.render.com:5432/postgresql_ece9
+ENV DATASOURCE_URL=jdbc:postgresql://ep-quiet-meadow-a14vpajc.ap-southeast-1.pg.koyeb.app/Customer_Data_Management
 ENV DATASOURCE_USERNAME=postgresql_ece9_user
 ENV DATASOURCE_PASSWORD=dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
 ENV DATASOURCE_DIALECT=POSTGRES
