@@ -19,9 +19,10 @@ datasources:
   default:
     driverClassName: org.postgresql.Driver
     db-type: postgres
-    url: jdbc:postgresql://ep-quiet-meadow-a14vpajc.ap-southeast-1.pg.koyeb.app/Customer_Data_Management
-    username: admin
-    password: npg_4GLP1VUosSaE
+    # Reads from environment variables. The part after the colon is a default for local dev.
+    url: ${DATASOURCES_DEFAULT_URL:jdbc:postgresql://localhost:5432/customer_data_management}
+    username: ${DATASOURCES_DEFAULT_USERNAME:postgres}
+    password: ${DATASOURCES_DEFAULT_PASSWORD:Pass@1234}
     dialect: POSTGRES
 netty:
   default:
