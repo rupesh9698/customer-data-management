@@ -19,10 +19,9 @@ datasources:
   default:
     driverClassName: org.postgresql.Driver
     db-type: postgres
-    # Reads from environment variables. The part after the colon is a default for local dev.
-    url: ${DATASOURCES_DEFAULT_URL:jdbc:postgresql://localhost:5432/customer_data_management}
+    url: ${DATASOURCES_DEFAULT_URL:jdbc:postgresql://localhost:5432/Customer_Data_Management}
     username: ${DATASOURCES_DEFAULT_USERNAME:postgres}
-    password: ${DATASOURCES_DEFAULT_PASSWORD:Pass@1234}
+    password: ${DATASOURCES_DEFAULT_PASSWORD:1234}
     dialect: POSTGRES
 netty:
   default:

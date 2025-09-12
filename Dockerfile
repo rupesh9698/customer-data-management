@@ -13,7 +13,7 @@ RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 RUN ./gradlew --no-daemon \
     -Dorg.gradle.jvmargs="-Xmx512m -XX:MaxMetaspaceSize=128m -XX:+UseContainerSupport" \
     -Dorg.gradle.workers.max=2 \
-    clean build -x test
+    clean shadowJar -x test
 
 # --- Runtime stage ---
 FROM amazoncorretto:21-alpine AS runtime
@@ -31,7 +31,7 @@ RUN addgroup -g 1001 appgroup && adduser -u 1001 -G appgroup -s /bin/sh -D appus
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-EXPOSE 5424
+EXPOSE 8080
 
 # Environment variables
 ENV MICRONAUT_ENVIRONMENTS=production
@@ -48,4 +48,4 @@ ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
 
 # Health check using localhost
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl --fail http://localhost:5424/health || exit 1
+  CMD curl --fail http://localhost:8080/health || exit 1
