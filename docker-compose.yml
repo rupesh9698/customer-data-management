@@ -6,9 +6,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - DATASOURCE_URL=jdbc:postgresql://ep-quiet-meadow-a14vpajc.ap-southeast-1.pg.koyeb.app/Customer_Data_Management
-      - DATASOURCE_USERNAME=postgresql_ece9_user
-      - DATASOURCE_PASSWORD=dl83vap5lV6aHrBRxwvIAnpXEw1FiGI9
+      - DATASOURCE_URL=jdbc:postgresql://localhost:5432/Customer_Data_Management
+      - DATASOURCE_USERNAME=postgres
+      - DATASOURCE_PASSWORD=1234
     depends_on:
       - db
 
